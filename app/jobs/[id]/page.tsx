@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { fetchJob, fetchRelatedJobs } from "@/app/lib/api";
+import { ApiRequestError, fetchJob, fetchRelatedJobs } from "@/app/lib/api";
 import { formatDate, formatSalaryRange } from "@/app/lib/format";
 import { JobCard } from "@/app/components/job-card";
 import { JobActions } from "./job-actions";
@@ -13,10 +13,15 @@ export default async function JobDetailsPage({
 }) {
   const { id } = await params;
 
-  const job = await fetchJob(id).catch(() => null);
-  if (!job) notFound();
+  let job;
+  try {
+    job = await fetchJob(id);
+  } catch (err) {
+    if (err instanceof ApiRequestError && err.status === 404) notFound();
+    throw err;
+  }
 
-  const related = await fetchRelatedJobs(id).catch(() => []);
+  const related = await fetchRelatedJobs(id);
 
   return (
     <div className="mx-auto w-full max-w-4xl px-4 py-12 sm:px-6">

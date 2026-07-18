@@ -16,6 +16,16 @@ import type {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
+export class ApiRequestError extends Error {
+  status: number;
+
+  constructor(message: string, status: number) {
+    super(message);
+    this.name = "ApiRequestError";
+    this.status = status;
+  }
+}
+
 async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${API_URL}${path}`, {
     ...init,
@@ -23,7 +33,10 @@ async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   });
   if (!res.ok) {
     const body = await res.json().catch(() => null);
-    throw new Error(body?.error?.message ?? `Request failed: ${res.status}`);
+    throw new ApiRequestError(
+      body?.error?.message ?? `Request failed: ${res.status}`,
+      res.status
+    );
   }
   if (res.status === 204) return undefined as T;
   return res.json();
