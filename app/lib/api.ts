@@ -1,6 +1,9 @@
 import type {
   Application,
   BlogPost,
+  ChatMessage,
+  GenerateJobInput,
+  GeneratedJobContent,
   Job,
   JobFilterOptions,
   JobsQuery,
@@ -129,5 +132,52 @@ export function subscribeNewsletter(email: string): Promise<{ email: string }> {
   return apiFetch<{ email: string }>("/api/newsletter", {
     method: "POST",
     body: JSON.stringify({ email }),
+  });
+}
+
+export function fetchChatHistory(userId: string): Promise<ChatMessage[]> {
+  return apiFetch<ChatMessage[]>(`/api/chat?userId=${userId}`);
+}
+
+export async function streamChat(
+  userId: string,
+  message: string,
+  onDelta: (text: string) => void
+): Promise<void> {
+  const res = await fetch(`${API_URL}/api/chat/stream`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ userId, message }),
+  });
+  if (!res.ok || !res.body) {
+    throw new Error(`Chat request failed: ${res.status}`);
+  }
+
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+
+    const lines = buffer.split("\n\n");
+    buffer = lines.pop() ?? "";
+    for (const line of lines) {
+      if (!line.startsWith("data: ")) continue;
+      const payload = JSON.parse(line.slice(6));
+      if (payload.error) throw new Error(payload.error);
+      if (payload.delta) onDelta(payload.delta);
+    }
+  }
+}
+
+export function generateJobContent(
+  input: GenerateJobInput
+): Promise<GeneratedJobContent> {
+  return apiFetch<GeneratedJobContent>("/api/ai/generate-job", {
+    method: "POST",
+    body: JSON.stringify(input),
   });
 }

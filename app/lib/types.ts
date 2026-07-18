@@ -90,3 +90,26 @@ export type PlatformStats = {
   companiesHiring: number;
   applicationsSubmitted: number;
 };
+
+export type ChatMessage = {
+  _id: string;
+  userId: string;
+  conversationId: string;
+  role: "user" | "assistant";
+  content: string;
+  createdAt: string;
+};
+
+export type GeneratedJobContent = {
+  title: string;
+  shortDescription: string;
+  fullDescription: string;
+};
+
+export type GenerateJobInput = {
+  role: string;
+  seniority: string;
+  keySkills?: string;
+  companyBlurb?: string;
+  length: "concise" | "standard" | "detailed";
+};

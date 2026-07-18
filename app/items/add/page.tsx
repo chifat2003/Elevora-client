@@ -4,8 +4,9 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 import { authClient } from "@/app/lib/auth-client";
-import { createJob } from "@/app/lib/api";
+import { createJob, generateJobContent } from "@/app/lib/api";
 import { JOB_CATEGORIES, JOB_TYPES, EXPERIENCE_LEVELS } from "@/app/lib/job-options";
+import type { GenerateJobInput } from "@/app/lib/types";
 
 export default function AddJobPage() {
   const router = useRouter();
@@ -24,6 +25,16 @@ export default function AddJobPage() {
   const [deadline, setDeadline] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [error, setError] = useState<string | null>(null);
+
+  const [genRole, setGenRole] = useState("");
+  const [genSeniority, setGenSeniority] = useState(EXPERIENCE_LEVELS[0]);
+  const [genKeySkills, setGenKeySkills] = useState("");
+  const [genCompanyBlurb, setGenCompanyBlurb] = useState("");
+  const [genLength, setGenLength] =
+    useState<GenerateJobInput["length"]>("standard");
+  const [generating, setGenerating] = useState(false);
+  const [genError, setGenError] = useState<string | null>(null);
+  const [hasGenerated, setHasGenerated] = useState(false);
 
   useEffect(() => {
     if (!isPending && session && role !== "recruiter") {
@@ -83,6 +94,32 @@ export default function AddJobPage() {
     mutation.mutate();
   };
 
+  const handleGenerate = async () => {
+    if (!genRole.trim()) {
+      setGenError("Enter a role to generate content for.");
+      return;
+    }
+    setGenError(null);
+    setGenerating(true);
+    try {
+      const result = await generateJobContent({
+        role: genRole,
+        seniority: genSeniority,
+        keySkills: genKeySkills,
+        companyBlurb: genCompanyBlurb,
+        length: genLength,
+      });
+      setTitle(result.title);
+      setShortDescription(result.shortDescription);
+      setFullDescription(result.fullDescription);
+      setHasGenerated(true);
+    } catch (err) {
+      setGenError(err instanceof Error ? err.message : "Generation failed");
+    } finally {
+      setGenerating(false);
+    }
+  };
+
   if (isPending || !session || role !== "recruiter") {
     return (
       <div className="mx-auto w-full max-w-2xl px-4 py-16 sm:px-6">
@@ -99,6 +136,76 @@ export default function AddJobPage() {
       <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
         Fill in the details below to publish a new job listing.
       </p>
+
+      <div className="mt-8 rounded-xl border border-primary/20 bg-primary/5 p-4">
+        <h2 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+          AI Content Generator
+        </h2>
+        <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-400">
+          Describe the role and let AI draft the title and descriptions below.
+        </p>
+
+        <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <input
+            type="text"
+            value={genRole}
+            onChange={(e) => setGenRole(e.target.value)}
+            placeholder="Role, e.g. Backend Engineer"
+            className="rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary focus:outline-none dark:border-neutral-700 dark:bg-neutral-900"
+          />
+          <select
+            value={genSeniority}
+            onChange={(e) => setGenSeniority(e.target.value)}
+            className="rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary focus:outline-none dark:border-neutral-700 dark:bg-neutral-900"
+          >
+            {EXPERIENCE_LEVELS.map((lvl) => (
+              <option key={lvl} value={lvl}>
+                {lvl}
+              </option>
+            ))}
+          </select>
+          <input
+            type="text"
+            value={genKeySkills}
+            onChange={(e) => setGenKeySkills(e.target.value)}
+            placeholder="Key skills (optional)"
+            className="rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary focus:outline-none dark:border-neutral-700 dark:bg-neutral-900"
+          />
+          <select
+            value={genLength}
+            onChange={(e) =>
+              setGenLength(e.target.value as GenerateJobInput["length"])
+            }
+            className="rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary focus:outline-none dark:border-neutral-700 dark:bg-neutral-900"
+          >
+            <option value="concise">Concise</option>
+            <option value="standard">Standard</option>
+            <option value="detailed">Detailed</option>
+          </select>
+          <textarea
+            value={genCompanyBlurb}
+            onChange={(e) => setGenCompanyBlurb(e.target.value)}
+            placeholder="Company blurb (optional)"
+            rows={2}
+            className="rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary focus:outline-none dark:border-neutral-700 dark:bg-neutral-900 sm:col-span-2"
+          />
+        </div>
+
+        {genError && <p className="mt-2 text-sm text-red-600">{genError}</p>}
+
+        <button
+          type="button"
+          onClick={handleGenerate}
+          disabled={generating}
+          className="mt-3 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-dark disabled:opacity-60"
+        >
+          {generating
+            ? "Generating…"
+            : hasGenerated
+              ? "Regenerate"
+              : "Generate with AI"}
+        </button>
+      </div>
 
       <form onSubmit={handleSubmit} className="mt-8 space-y-4">
         <div>
