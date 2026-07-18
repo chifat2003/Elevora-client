@@ -62,3 +62,31 @@ export type SavedJob = {
   savedAt: string;
   job: Job | null;
 };
+
+export type BlogPost = {
+  _id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content?: string;
+  coverImageUrl: string;
+  author: string;
+  category: string;
+  publishedAt: string;
+};
+
+export type Testimonial = {
+  _id: string;
+  name: string;
+  role: string;
+  company: string;
+  quote: string;
+  avatarUrl: string;
+  createdAt: string;
+};
+
+export type PlatformStats = {
+  jobsPosted: number;
+  companiesHiring: number;
+  applicationsSubmitted: number;
+};

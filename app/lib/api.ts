@@ -1,10 +1,13 @@
 import type {
   Application,
+  BlogPost,
   Job,
   JobFilterOptions,
   JobsQuery,
   JobsResponse,
+  PlatformStats,
   SavedJob,
+  Testimonial,
 } from "./types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -103,5 +106,28 @@ export function unsaveJob(id: string, seekerId: string): Promise<void> {
   return apiFetch<void>(`/api/saved-jobs/${id}`, {
     method: "DELETE",
     body: JSON.stringify({ seekerId }),
+  });
+}
+
+export function fetchBlogPosts(): Promise<BlogPost[]> {
+  return apiFetch<BlogPost[]>("/api/blog-posts");
+}
+
+export function fetchBlogPost(slug: string): Promise<BlogPost> {
+  return apiFetch<BlogPost>(`/api/blog-posts/${slug}`);
+}
+
+export function fetchTestimonials(): Promise<Testimonial[]> {
+  return apiFetch<Testimonial[]>("/api/testimonials");
+}
+
+export function fetchStats(): Promise<PlatformStats> {
+  return apiFetch<PlatformStats>("/api/stats");
+}
+
+export function subscribeNewsletter(email: string): Promise<{ email: string }> {
+  return apiFetch<{ email: string }>("/api/newsletter", {
+    method: "POST",
+    body: JSON.stringify({ email }),
   });
 }

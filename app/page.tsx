@@ -1,32 +1,42 @@
-import Link from "next/link";
+import {
+  fetchBlogPosts,
+  fetchJobFilters,
+  fetchJobs,
+  fetchStats,
+  fetchTestimonials,
+} from "@/app/lib/api";
+import { Hero } from "@/app/components/landing/hero";
+import { FeaturedJobsSection } from "@/app/components/landing/featured-jobs-section";
+import { CategoriesSection } from "@/app/components/landing/categories-section";
+import { HowItWorksSection } from "@/app/components/landing/how-it-works-section";
+import { StatsSection } from "@/app/components/landing/stats-section";
+import { TestimonialsSection } from "@/app/components/landing/testimonials-section";
+import { BlogHighlightsSection } from "@/app/components/landing/blog-highlights-section";
+import { NewsletterSection } from "@/app/components/landing/newsletter-section";
+import { FaqSection } from "@/app/components/landing/faq-section";
+import { CtaSection } from "@/app/components/landing/cta-section";
 
-export default function Home() {
+export default async function Home() {
+  const [jobsResponse, filters, stats, testimonials, blogPosts] = await Promise.all([
+    fetchJobs({ sort: "newest", limit: 8 }),
+    fetchJobFilters(),
+    fetchStats(),
+    fetchTestimonials(),
+    fetchBlogPosts(),
+  ]);
+
   return (
-    <div className="flex flex-1 flex-col items-center justify-center px-4 py-24 text-center sm:px-6">
-      <h1 className="max-w-2xl text-4xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 sm:text-5xl">
-        Find the right job. Find the right hire.
-      </h1>
-      <p className="mt-4 max-w-xl text-lg text-neutral-600 dark:text-neutral-400">
-        Elevora connects job seekers and recruiters with searchable listings,
-        AI-assisted recommendations, and a smarter way to manage hiring.
-      </p>
-      <div className="mt-8 flex gap-4">
-        <Link
-          href="/jobs"
-          className="rounded-lg bg-primary px-6 py-3 text-sm font-medium text-white hover:bg-primary-dark"
-        >
-          Browse Jobs
-        </Link>
-        <Link
-          href="/register"
-          className="rounded-lg border border-neutral-300 px-6 py-3 text-sm font-medium text-neutral-700 hover:bg-neutral-50 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800"
-        >
-          Get Started
-        </Link>
-      </div>
-      <p className="mt-6 text-xs text-neutral-500 dark:text-neutral-400">
-        The full landing page (featured listings, categories, stats, and more) lands in Milestone 4.
-      </p>
+    <div className="flex flex-1 flex-col">
+      <Hero featuredJobs={jobsResponse.jobs.slice(0, 5)} />
+      <FeaturedJobsSection jobs={jobsResponse.jobs.slice(0, 4)} />
+      <CategoriesSection categories={filters.categories} />
+      <HowItWorksSection />
+      <StatsSection stats={stats} />
+      <TestimonialsSection testimonials={testimonials} />
+      <BlogHighlightsSection posts={blogPosts} />
+      <NewsletterSection />
+      <FaqSection />
+      <CtaSection />
     </div>
   );
 }
