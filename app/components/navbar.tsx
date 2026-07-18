@@ -1,9 +1,30 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/app/lib/auth-client";
+
+function Avatar({ name, image, size = 32 }: { name: string; image?: string | null; size?: number }) {
+  return (
+    <div
+      className="relative shrink-0 overflow-hidden rounded-full bg-primary/10"
+      style={{ width: size, height: size }}
+    >
+      {image ? (
+        <Image src={image} alt={name} fill sizes={`${size}px`} className="object-cover" unoptimized />
+      ) : (
+        <div
+          className="flex h-full w-full items-center justify-center font-semibold text-primary"
+          style={{ fontSize: size * 0.45 }}
+        >
+          {name?.charAt(0).toUpperCase() ?? "?"}
+        </div>
+      )}
+    </div>
+  );
+}
 
 const loggedOutLinks = [
   { href: "/", label: "Home" },
@@ -70,14 +91,17 @@ export function Navbar() {
         <div className="hidden items-center gap-3 md:flex">
           {isPending ? null : session ? (
             <>
-              <div className="flex flex-col items-end leading-tight">
-                <span className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
-                  {session.user.name}
-                </span>
-                <span className="inline-flex rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-                  {roleLabel}
-                </span>
-              </div>
+              <Link href="/profile" className="flex items-center gap-2">
+                <Avatar name={session.user.name} image={session.user.image} />
+                <div className="flex flex-col items-end leading-tight">
+                  <span className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                    {session.user.name}
+                  </span>
+                  <span className="inline-flex rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                    {roleLabel}
+                  </span>
+                </div>
+              </Link>
               <button
                 onClick={handleLogout}
                 className="rounded-lg bg-neutral-100 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-200"
@@ -125,14 +149,21 @@ export function Navbar() {
         <div className="border-t border-neutral-200 px-4 pb-4 dark:border-neutral-700 md:hidden">
           {session && (
             <div className="flex items-center justify-between border-b border-neutral-200 py-3 dark:border-neutral-700">
-              <div className="flex flex-col leading-tight">
-                <span className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
-                  {session.user.name}
-                </span>
-                <span className="mt-0.5 inline-flex w-fit rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-                  {roleLabel}
-                </span>
-              </div>
+              <Link
+                href="/profile"
+                onClick={() => setMenuOpen(false)}
+                className="flex items-center gap-2"
+              >
+                <Avatar name={session.user.name} image={session.user.image} />
+                <div className="flex flex-col leading-tight">
+                  <span className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                    {session.user.name}
+                  </span>
+                  <span className="mt-0.5 inline-flex w-fit rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                    {roleLabel}
+                  </span>
+                </div>
+              </Link>
             </div>
           )}
 

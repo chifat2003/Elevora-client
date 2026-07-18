@@ -1,4 +1,5 @@
 import type {
+  Applicant,
   Application,
   BlogPost,
   ChatMessage,
@@ -92,6 +93,15 @@ export function withdrawApplication(
     method: "DELETE",
     body: JSON.stringify({ seekerId }),
   });
+}
+
+export function fetchJobApplicants(
+  jobId: string,
+  recruiterId: string
+): Promise<Applicant[]> {
+  return apiFetch<Applicant[]>(
+    `/api/applications/by-job/${jobId}?recruiterId=${recruiterId}`
+  );
 }
 
 export function fetchSavedJobs(seekerId: string): Promise<SavedJob[]> {

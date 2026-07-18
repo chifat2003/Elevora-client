@@ -55,6 +55,15 @@ export type Application = {
   job: Job | null;
 };
 
+export type Applicant = {
+  _id: string;
+  jobId: string;
+  seekerId: string;
+  seekerName: string | null;
+  status: string;
+  appliedAt: string;
+};
+
 export type SavedJob = {
   _id: string;
   jobId: string;
