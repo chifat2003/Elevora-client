@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { fetchJob, fetchRelatedJobs } from "@/app/lib/api";
 import { formatDate, formatSalaryRange } from "@/app/lib/format";
 import { JobCard } from "@/app/components/job-card";
+import { JobActions } from "./job-actions";
 
 export default async function JobDetailsPage({
   params,
@@ -49,6 +50,8 @@ export default async function JobDetailsPage({
             <span>{job.type}</span>
             <span>{job.experienceLevel}</span>
           </div>
+
+          <JobActions jobId={job._id} />
         </div>
       </div>
 

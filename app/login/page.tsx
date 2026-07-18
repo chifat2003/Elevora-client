@@ -1,13 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { authClient } from "@/app/lib/auth-client";
 import { DEMO_ACCOUNTS } from "@/app/lib/demo-accounts";
 
 export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
+  );
+}
+
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirectTo") || "/";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -29,7 +39,7 @@ export default function LoginPage() {
       setError(signInError.message ?? "Invalid email or password.");
       return;
     }
-    router.push("/");
+    router.push(redirectTo);
     router.refresh();
   };
 
@@ -46,7 +56,7 @@ export default function LoginPage() {
   };
 
   const handleGoogleLogin = async () => {
-    await authClient.signIn.social({ provider: "google", callbackURL: "/" });
+    await authClient.signIn.social({ provider: "google", callbackURL: redirectTo });
   };
 
   return (

@@ -39,7 +39,26 @@ export type JobsQuery = {
   experienceLevel?: string;
   minSalary?: number;
   maxSalary?: number;
+  recruiterId?: string;
   sort?: "newest" | "salary_asc" | "salary_desc";
   page?: number;
   limit?: number;
+};
+
+export type Application = {
+  _id: string;
+  jobId: string;
+  seekerId: string;
+  seekerName: string | null;
+  status: string;
+  appliedAt: string;
+  job: Job | null;
+};
+
+export type SavedJob = {
+  _id: string;
+  jobId: string;
+  seekerId: string;
+  savedAt: string;
+  job: Job | null;
 };

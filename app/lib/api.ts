@@ -1,4 +1,11 @@
-import type { Job, JobFilterOptions, JobsQuery, JobsResponse } from "./types";
+import type {
+  Application,
+  Job,
+  JobFilterOptions,
+  JobsQuery,
+  JobsResponse,
+  SavedJob,
+} from "./types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -53,5 +60,48 @@ export function deleteJob(id: string, recruiterId: string): Promise<void> {
   return apiFetch<void>(`/api/jobs/${id}`, {
     method: "DELETE",
     body: JSON.stringify({ recruiterId }),
+  });
+}
+
+export function fetchApplications(seekerId: string): Promise<Application[]> {
+  return apiFetch<Application[]>(`/api/applications?seekerId=${seekerId}`);
+}
+
+export function applyToJob(
+  jobId: string,
+  seekerId: string,
+  seekerName: string
+): Promise<Application> {
+  return apiFetch<Application>("/api/applications", {
+    method: "POST",
+    body: JSON.stringify({ jobId, seekerId, seekerName }),
+  });
+}
+
+export function withdrawApplication(
+  id: string,
+  seekerId: string
+): Promise<void> {
+  return apiFetch<void>(`/api/applications/${id}`, {
+    method: "DELETE",
+    body: JSON.stringify({ seekerId }),
+  });
+}
+
+export function fetchSavedJobs(seekerId: string): Promise<SavedJob[]> {
+  return apiFetch<SavedJob[]>(`/api/saved-jobs?seekerId=${seekerId}`);
+}
+
+export function saveJob(jobId: string, seekerId: string): Promise<SavedJob> {
+  return apiFetch<SavedJob>("/api/saved-jobs", {
+    method: "POST",
+    body: JSON.stringify({ jobId, seekerId }),
+  });
+}
+
+export function unsaveJob(id: string, seekerId: string): Promise<void> {
+  return apiFetch<void>(`/api/saved-jobs/${id}`, {
+    method: "DELETE",
+    body: JSON.stringify({ seekerId }),
   });
 }
