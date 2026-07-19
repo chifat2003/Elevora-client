@@ -125,18 +125,18 @@ function LoginForm() {
         </button>
       </div>
 
-      <div className="mt-6 flex items-center gap-3">
+      {/* <div className="mt-6 flex items-center gap-3">
         <div className="h-px flex-1 bg-neutral-200 dark:bg-neutral-700" />
         <span className="text-xs text-neutral-500">or</span>
         <div className="h-px flex-1 bg-neutral-200 dark:bg-neutral-700" />
-      </div>
+      </div> */}
 
-      <button
+      {/* <button
         onClick={handleGoogleLogin}
         className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg border border-neutral-300 px-5 py-2.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800"
       >
         Continue with Google
-      </button>
+      </button> */}
     </div>
   );
 }

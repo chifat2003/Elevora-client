@@ -44,10 +44,6 @@ export default function RegisterPage() {
     router.refresh();
   };
 
-  const handleGoogleSignup = async () => {
-    await authClient.signIn.social({ provider: "google", callbackURL: "/" });
-  };
-
   return (
     <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-4 py-16 sm:px-6">
       <h1 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
@@ -139,19 +135,6 @@ export default function RegisterPage() {
           {loading ? "Creating account…" : "Create account"}
         </button>
       </form>
-
-      <div className="mt-6 flex items-center gap-3">
-        <div className="h-px flex-1 bg-neutral-200 dark:bg-neutral-700" />
-        <span className="text-xs text-neutral-500">or</span>
-        <div className="h-px flex-1 bg-neutral-200 dark:bg-neutral-700" />
-      </div>
-
-      <button
-        onClick={handleGoogleSignup}
-        className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg border border-neutral-300 px-5 py-2.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800"
-      >
-        Continue with Google
-      </button>
     </div>
   );
 }
